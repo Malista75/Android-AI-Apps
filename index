@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top AI Apps Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+        .bar-chart-container {
+            position: relative;
+            height: 220px;
+            width: 100%;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <!-- Header and Introduction -->
+        <header class="text-center mb-12">
+            <div class="flex justify-center items-center mb-2">
+                <!-- Android Logo SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 md:h-12 md:w-12 text-green-500 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.78,4.14a1,1,0,0,0-1.32,0L15.42,6.18a3.58,3.58,0,0,0-6.84,0L6.54,4.14a1,1,0,0,0-1.32,0,1,1,0,0,0,0,1.32L7.26,7.5A3.58,3.58,0,0,0,4.5,10.65v5.5A1.85,1.85,0,0,0,6.35,18H8.5V16.15H7.35V11.5A1,1,0,0,1,8.35,10.5h7.3a1,1,0,0,1,1,1v4.65H15.5V18h2.15A1.85,1.85,0,0,0,19.5,16.15v-5.5a3.58,3.58,0,0,0-2.76-3.15l2.04-2.04A1,1,0,0,0,18.78,4.14ZM9.15,9.5a.8.8,0,1,1-.8-.8A.8.8,0,0,1,9.15,9.5ZM15.65,8.7a.8.8,0,1,1,.8.8A.8.8,0,0,1,15.65,8.7Z"/>
+                </svg>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Analysis of Top AI Apps</h1>
+            </div>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                This page visualizes data on the leading AI applications available on Android, categorized by their primary function. The analysis is based on information compiled by <a href="https://www.blog.udonis.co/mobile-marketing/mobile-apps/top-ai-apps" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-semibold">Udonis Co.</a> and highlights trends in downloads and monthly active users (MAU).
+            </p>
+        </header>
+
+        <!-- Overall Category Distribution -->
+        <section class="card p-6 md:p-8 mb-12">
+            <h2 class="text-2xl font-bold text-center mb-6">Overall Market Share by Category</h2>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h3 class="text-xl font-semibold text-center mb-4">Total Downloads Distribution</h3>
+                    <div class="chart-container mx-auto max-w-md">
+                        <canvas id="categoryDownloadsChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-center mb-4">Monthly Active Users (MAU) Distribution</h3>
+                    <div class="chart-container mx-auto max-w-md">
+                        <canvas id="categoryMauChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detailed Category Breakdown -->
+        <section>
+            <h2 class="text-2xl font-bold text-center mb-8">Category Drill-Down: Top Apps</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8" id="category-breakdown">
+                <!-- Category cards will be injected here by JavaScript -->
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Data for the charts
+        const chartData = {
+            categories: {
+                "AI Assistants & Chatbots": { downloads: 1630, mau: 600.3, description: "Apps that function as conversational AI to answer questions and perform tasks." },
+                "AI Social & Companion Apps": { downloads: 174.4, mau: 21.7, description: "Applications centered around social interaction with AI-powered characters." },
+                "Productivity & Utility Apps": { downloads: 113.8, mau: 15.2, description: "AI-powered tools for writing, coding, document summarization, and more." },
+                "AI Art & Image Generators": { downloads: 141.7, mau: 2.8, description: "Apps that specialize in creating and editing images using artificial intelligence." },
+                "AI Music Generators": { downloads: 31.5, mau: 3.7, description: "Creative tools that use AI to generate original music from text prompts or samples." },
+                "Niche & Entertainment Apps": { downloads: 15.8, mau: 1.6, description: "Specialized AI applications with unique or entertainment-focused functionalities." },
+                "AI Video Generators": { downloads: 5.2, mau: 0.31, description: "Platforms that leverage AI to create or modify video content automatically." },
+            },
+            apps: {
+                "AI Assistants & Chatbots": [
+                    { name: "ChatGPT", downloads: 917, mau: 273 },
+                    { name: "Google Gemini", downloads: 178, mau: 29 },
+                    { name: "DeepSeek", downloads: 127, mau: 249 }
+                ],
+                "AI Art & Image Generators": [
+                    { name: "WOMBO Dream", downloads: 41.4, mau: 0.442 },
+                    { name: "Wonder", downloads: 39.0, mau: 0.517 },
+                    { name: "ImagineArt", downloads: 24.6, mau: 0.650 }
+                ],
+                "AI Video Generators": [
+                    { name: "D-ID Video Gen", downloads: 5.2, mau: 0.31 }
+                ],
+                "AI Social & Companion Apps": [
+                    { name: "Character AI", downloads: 69, mau: 4 },
+                    { name: "Talkie", downloads: 54, mau: 3.9 },
+                    { name: "Replika", downloads: 30.7, mau: 0.542 }
+                ],
+                "Productivity & Utility Apps": [
+                    { name: "ChatOn AI", downloads: 66, mau: 3.9 },
+                    { name: "Genie", downloads: 29.8, mau: 2.6 },
+                    { name: "Chat Smith 4", downloads: 28.4, mau: 1.4 }
+                ],
+                 "AI Music Generators": [
+                    { name: "Suno", downloads: 25.6, mau: 2.5 },
+                    { name: "MyTunes", downloads: 5.9, mau: 1.2 }
+                ],
+                "Niche & Entertainment Apps": [
+                    { name: "Glam AI", downloads: 11.0, mau: 0 },
+                    { name: "Parrot", downloads: 4.2, mau: 0.217 }
+                ]
+            }
+        };
+        const colors = ['#3b82f6', '#ef4444', '#22c55e', '#f97316', '#a855f7', '#eab308', '#14b8a6', '#6366f1'];
+        
+        Chart.register(ChartDataLabels);
+
+        // --- Helper function to create donut charts ---
+        function createDonutChart(ctx, labels, data, title) {
+            const total = data.reduce((a, b) => a + b, 0);
+            
+            return new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: title,
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: '#ffffff',
+                        borderWidth: 4,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20, font: { size: 14 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    let label = context.label || '';
+                                    const value = context.raw;
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    let unit = title.toLowerCase().includes('downloads') ? 'M' : 'M MAU';
+                                    return `${label}: ${value.toLocaleString()}${unit} (${percentage}%)`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                const percentage = ((value / total) * 100);
+                                return percentage > 5 ? percentage.toFixed(0) + '%' : '';
+                            },
+                            color: '#fff',
+                            font: { weight: 'bold', size: 14 },
+                            textStrokeColor: '#1f2937',
+                            textStrokeWidth: 2
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        // --- Helper function to create horizontal bar charts ---
+        function createHorizontalBarChart(ctx, labels, data, title, isMau = false) {
+             return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: title,
+                        data: data,
+                        backgroundColor: (context) => colors[context.dataIndex % colors.length],
+                        borderColor: (context) => colors[context.dataIndex % colors.length],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const value = context.raw;
+                                    let unit = isMau ? 'M MAU' : 'M Dls';
+                                    if (isMau && value < 1) {
+                                       return ` ${(value*1000).toLocaleString()}k MAU`;
+                                    }
+                                    return ` ${value.toLocaleString()}${unit}`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            offset: -8,
+                            formatter: (value) => {
+                                if (isMau && value < 1) {
+                                    return `${(value*1000).toLocaleString()}k`;
+                                }
+                                return `${value.toLocaleString()}M`;
+                            },
+                            color: '#ffffff',
+                            font: { weight: 'bold', size: 12 },
+                            textStrokeColor: '#1f2937',
+                            textStrokeWidth: 2
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: { display: false },
+                            ticks: { display: false }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // --- Render Charts on Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Main Category Charts
+            const categoryLabels = Object.keys(chartData.categories);
+            const categoryDownloads = categoryLabels.map(label => chartData.categories[label].downloads);
+            const categoryMau = categoryLabels.map(label => chartData.categories[label].mau);
+
+            createDonutChart(document.getElementById('categoryDownloadsChart').getContext('2d'), categoryLabels, categoryDownloads, 'Total Downloads (in Millions)');
+            createDonutChart(document.getElementById('categoryMauChart').getContext('2d'), categoryLabels, categoryMau, 'Total MAU (in Millions)');
+
+            // Detailed Category Breakdowns
+            const breakdownContainer = document.getElementById('category-breakdown');
+            categoryLabels.forEach(category => {
+                const description = chartData.categories[category].description;
+                
+                const cardHTML = `
+                    <div class="card p-6 flex flex-col">
+                        <h3 class="text-xl font-bold mb-2 text-center">${category}</h3>
+                        <p class="text-gray-600 text-center text-sm mb-4 h-10">${description}</p>
+                        <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-semibold mb-2 text-center">Downloads Breakdown</h4>
+                                <div class="bar-chart-container">
+                                    <canvas id="dls-bar-${category.replace(/\s/g, '')}"></canvas>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-2 text-center">MAU Breakdown</h4>
+                                <div class="bar-chart-container">
+                                    <canvas id="mau-bar-${category.replace(/\s/g, '')}"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                breakdownContainer.innerHTML += cardHTML;
+            });
+            
+            // Now that canvases are in the DOM, create the bar charts
+            setTimeout(() => {
+                categoryLabels.forEach(category => {
+                    const totalDownloads = chartData.categories[category].downloads;
+                    const totalMau = chartData.categories[category].mau;
+                    const apps = chartData.apps[category] || [];
+
+                    // --- Downloads Chart Data Prep ---
+                    const topAppsDownloads = [...apps].sort((a, b) => b.downloads - a.downloads);
+                    const otherDownloads = totalDownloads - topAppsDownloads.reduce((sum, app) => sum + app.downloads, 0);
+                    
+                    // Reverse the sorted list so the #1 app is at the end (will be on top of the chart)
+                    let finalDownloads = topAppsDownloads.reverse();
+
+                    // Add "Others" to the beginning of the array (will be at the bottom of the chart)
+                    if (otherDownloads > 1) {
+                         finalDownloads.unshift({ name: 'Others', downloads: otherDownloads });
+                    }
+                    
+                    const downloadLabels = finalDownloads.map(a => a.name);
+                    const downloadData = finalDownloads.map(a => a.downloads);
+                    createHorizontalBarChart(document.getElementById(`dls-bar-${category.replace(/\s/g, '')}`).getContext('2d'), downloadLabels, downloadData, 'Downloads');
+                    
+                    // --- MAU Chart Data Prep ---
+                    const topAppsMau = [...apps].filter(a => a.mau > 0).sort((a, b) => b.mau - a.mau);
+                    const otherMau = totalMau - topAppsMau.reduce((sum, app) => sum + app.mau, 0);
+
+                    // Reverse the sorted list
+                    let finalMau = topAppsMau.reverse();
+
+                    // Add "Others" to the beginning of the array
+                     if (otherMau > 0.01) {
+                        finalMau.unshift({ name: 'Others', mau: otherMau });
+                    }
+
+                    const mauLabels = finalMau.map(a => a.name);
+                    const mauData = finalMau.map(a => a.mau);
+                    createHorizontalBarChart(document.getElementById(`mau-bar-${category.replace(/\s/g, '')}`).getContext('2d'), mauLabels, mauData, 'MAU', true);
+                });
+            }, 100);
+        });
+    </script>
+
+</body>
+</html>
+
